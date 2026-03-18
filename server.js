@@ -3,7 +3,6 @@ const http = require('http');
 const WebSocket = require('ws');
 const QRCode = require('qrcode');
 const path = require('path');
-const questions = require('./questions');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,24 +10,33 @@ const wss = new WebSocket.Server({ server });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.get('/host', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'host.html'));
-});
-app.get('/play', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'play.html'));
-});
-// ─── ゲーム状態 ───────────────────────────────────────────
-const QUESTION_TIME = 20; // 秒
+
+// ─── 問題読み込み ─────────────────────────────────────────
+function loadQuestions() {
+  try {
+    delete require.cache[require.resolve('./questions')];
+    return require('./questions');
+  } catch (e) {
+    console.error('questions.js 読み込みエラー:', e.message);
+    return [];
+  }
+}
+let questions = loadQuestions();
+
+// ─── 設定 ─────────────────────────────────────────────────
+const QUESTION_TIME = 20;
 const MAX_POINTS = 1000;
 const MIN_POINTS = 100;
 
+// ─── ゲーム状態 ───────────────────────────────────────────
 let gameState = {
-  phase: 'waiting',      // waiting | question | answer | ranking | finished
+  phase: 'waiting',
   currentQ: -1,
   questionStart: null,
-  answers: {},           // playerId -> { choice, timeMs, points }
-  players: {},           // playerId -> { name, score, connected }
+  answers: {},
+  players: {},
   hostId: null,
+  fastestAnswer: null,
 };
 
 // ─── ユーティリティ ────────────────────────────────────────
@@ -70,6 +78,10 @@ function getQuestionForClient(idx) {
   };
 }
 
+function makeSessionKey() {
+  return Math.random().toString(36).slice(2, 12);
+}
+
 // ─── WebSocket ────────────────────────────────────────────
 wss.on('connection', (ws) => {
   ws.playerId = Math.random().toString(36).slice(2, 10);
@@ -80,7 +92,6 @@ wss.on('connection', (ws) => {
 
     switch (msg.type) {
 
-      // 幹事が接続
       case 'host_join': {
         ws.isHost = true;
         ws.playerId = 'host_' + ws.playerId;
@@ -98,27 +109,75 @@ wss.on('connection', (ws) => {
         break;
       }
 
-      // 参加者が名前登録
       case 'player_join': {
         const name = (msg.name || '').trim().slice(0, 12) || '名無し';
+        const sessionKey = makeSessionKey();
         ws.playerName = name;
-        gameState.players[ws.playerId] = { name, score: 0, isHost: false, connected: true };
+        ws.sessionKey = sessionKey;
+        gameState.players[ws.playerId] = { name, score: 0, isHost: false, connected: true, sessionKey };
         sendTo(ws, {
           type: 'joined',
           playerId: ws.playerId,
+          sessionKey,
           name,
+          score: 0,
           phase: gameState.phase,
           ...(gameState.phase === 'question' ? {
             question: getQuestionForClient(gameState.currentQ),
             elapsed: Date.now() - gameState.questionStart,
           } : {}),
+          ...(gameState.phase === 'answer' || gameState.phase === 'ranking' ? {
+            ranking: getRanking(),
+          } : {}),
         });
-        // 幹事に人数通知
         broadcast({ type: 'player_count', count: Object.values(gameState.players).filter(p => !p.isHost).length });
         break;
       }
 
-      // 幹事：次の問題へ
+      // 再接続（点数復元）
+      case 'player_reconnect': {
+        const { sessionKey, name } = msg;
+        const existing = Object.entries(gameState.players).find(
+          ([, p]) => p.sessionKey === sessionKey && !p.isHost
+        );
+        if (existing) {
+          const [oldId, player] = existing;
+          delete gameState.players[oldId];
+          player.connected = true;
+          gameState.players[ws.playerId] = player;
+          ws.playerName = player.name;
+          ws.sessionKey = sessionKey;
+          // 回答済みデータも新IDに移行
+          if (gameState.answers[oldId]) {
+            gameState.answers[ws.playerId] = gameState.answers[oldId];
+            delete gameState.answers[oldId];
+          }
+          sendTo(ws, {
+            type: 'reconnected',
+            playerId: ws.playerId,
+            sessionKey,
+            name: player.name,
+            score: player.score,
+            phase: gameState.phase,
+            ranking: getRanking(),
+            ...(gameState.phase === 'question' ? {
+              question: getQuestionForClient(gameState.currentQ),
+              elapsed: Date.now() - gameState.questionStart,
+              alreadyAnswered: !!gameState.answers[ws.playerId],
+            } : {}),
+          });
+        } else {
+          const newName = (name || '').trim().slice(0, 12) || '名無し';
+          const newKey = makeSessionKey();
+          ws.playerName = newName;
+          ws.sessionKey = newKey;
+          gameState.players[ws.playerId] = { name: newName, score: 0, isHost: false, connected: true, sessionKey: newKey };
+          sendTo(ws, { type: 'joined', playerId: ws.playerId, sessionKey: newKey, name: newName, score: 0, phase: gameState.phase });
+        }
+        broadcast({ type: 'player_count', count: Object.values(gameState.players).filter(p => !p.isHost).length });
+        break;
+      }
+
       case 'next_question': {
         if (!ws.isHost) break;
         const nextIdx = gameState.currentQ + 1;
@@ -131,13 +190,8 @@ wss.on('connection', (ws) => {
         gameState.phase = 'question';
         gameState.questionStart = Date.now();
         gameState.answers = {};
-
-        broadcast({
-          type: 'question_start',
-          question: getQuestionForClient(nextIdx),
-        });
-
-        // タイムアップ自動処理
+        gameState.fastestAnswer = null;
+        broadcast({ type: 'question_start', question: getQuestionForClient(nextIdx) });
         setTimeout(() => {
           if (gameState.currentQ === nextIdx && gameState.phase === 'question') {
             revealAnswer(nextIdx);
@@ -146,14 +200,12 @@ wss.on('connection', (ws) => {
         break;
       }
 
-      // 幹事：正解を手動で発表
       case 'reveal_answer': {
         if (!ws.isHost) break;
         revealAnswer(gameState.currentQ);
         break;
       }
 
-      // 幹事：ランキング表示
       case 'show_ranking': {
         if (!ws.isHost) break;
         gameState.phase = 'ranking';
@@ -161,21 +213,23 @@ wss.on('connection', (ws) => {
         break;
       }
 
-      // 参加者：回答送信
       case 'answer': {
         if (gameState.phase !== 'question') break;
-        if (gameState.answers[ws.playerId]) break; // 二重回答防止
+        if (gameState.answers[ws.playerId]) break;
         const timeMs = Date.now() - gameState.questionStart;
         if (timeMs > QUESTION_TIME * 1000) break;
-        gameState.answers[ws.playerId] = {
-          choice: msg.choice,
-          timeMs,
-        };
+        gameState.answers[ws.playerId] = { choice: msg.choice, timeMs };
         sendTo(ws, { type: 'answer_received', choice: msg.choice });
-        // 幹事に回答数通知
         const answerCount = Object.keys(gameState.answers).length;
         const playerCount = Object.values(gameState.players).filter(p => !p.isHost).length;
         broadcast({ type: 'answer_progress', answered: answerCount, total: playerCount });
+        break;
+      }
+
+      case 'update_questions': {
+        if (!ws.isHost) break;
+        questions = msg.questions;
+        sendTo(ws, { type: 'questions_updated', count: questions.length });
         break;
       }
 
@@ -196,8 +250,8 @@ function revealAnswer(qIdx) {
   if (gameState.phase !== 'question' && gameState.phase !== 'answer') return;
   gameState.phase = 'answer';
   const correct = questions[qIdx].correct;
+  let fastest = null;
 
-  // ポイント加算
   Object.entries(gameState.answers).forEach(([pid, ans]) => {
     if (ans.choice === correct) {
       const pts = calcPoints(ans.timeMs);
@@ -205,21 +259,28 @@ function revealAnswer(qIdx) {
         gameState.players[pid].score += pts;
         ans.points = pts;
       }
+      if (!fastest || ans.timeMs < fastest.timeMs) {
+        fastest = { name: gameState.players[pid]?.name || '?', timeMs: ans.timeMs };
+      }
     }
   });
+
+  gameState.fastestAnswer = fastest;
 
   broadcast({
     type: 'answer_reveal',
     correct,
     answers: gameState.answers,
     ranking: getRanking(),
+    fastest,
   });
 }
 
 // ─── HTTP API ─────────────────────────────────────────────
 app.get('/api/qr', async (req, res) => {
   const host = req.headers.host;
-  const url = `http://${host}/play`;
+  const proto = req.headers['x-forwarded-proto'] || 'http';
+  const url = `${proto}://${host}/play`;
   try {
     const dataUrl = await QRCode.toDataURL(url, { width: 300, margin: 2 });
     res.json({ qr: dataUrl, url });
@@ -228,20 +289,22 @@ app.get('/api/qr', async (req, res) => {
   }
 });
 
-app.get('/api/state', (req, res) => {
-  res.json({
-    phase: gameState.phase,
-    currentQ: gameState.currentQ,
-    totalQ: questions.length,
-    playerCount: Object.values(gameState.players).filter(p => !p.isHost).length,
-    ranking: getRanking(),
-  });
-});
+app.get('/api/questions', (req, res) => res.json(questions));
+app.get('/api/state', (req, res) => res.json({
+  phase: gameState.phase, currentQ: gameState.currentQ,
+  totalQ: questions.length,
+  playerCount: Object.values(gameState.players).filter(p => !p.isHost).length,
+  ranking: getRanking(),
+}));
 
-// ─── 起動 ─────────────────────────────────────────────────
+app.get('/host',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'host.html')));
+app.get('/play',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'play.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`\n🎉 Wedding Quiz Server running!`);
-  console.log(`   幹事画面: http://localhost:${PORT}/host`);
-  console.log(`   参加者画面: http://localhost:${PORT}/play\n`);
+  console.log(`\n🎉 Wedding Quiz Server running on port ${PORT}`);
+  console.log(`   幹事画面:   http://localhost:${PORT}/host`);
+  console.log(`   参加者画面: http://localhost:${PORT}/play`);
+  console.log(`   管理画面:   http://localhost:${PORT}/admin\n`);
 });

@@ -3,268 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎉 クイズ大会 幹事画面</title>
+<title>🎉 あくと＆りりか クイズ大会 幹事画面</title>
 <style>
   :root {
-    --crimson: #6B0010;
-    --crimson2: #8B0020;
-    --gold: #C9A84C;
-    --gold-l: #E8D08A;
-    --off-white: #F5EED8;
-    --dark: #1a0005;
+    --crimson:#6B0010; --crimson2:#8B0020; --gold:#C9A84C;
+    --gold-l:#E8D08A; --gold-ll:#F5E9C0; --off-white:#F5EED8;
+    --dark:#1a0005;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Georgia', serif;
-    background: var(--dark);
-    color: var(--off-white);
-    min-height: 100vh;
-  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Georgia',serif; background:var(--dark); color:var(--off-white); min-height:100vh; }
 
-  /* ── TOP BAR ── */
-  .topbar {
-    background: var(--gold);
-    color: var(--crimson);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 24px;
-    font-weight: bold;
-    font-size: 15px;
+  .topbar{
+    background:var(--gold); color:var(--crimson);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 20px; font-weight:bold;
   }
-  .topbar .title { font-size: 20px; letter-spacing: 3px; }
-  .status-pill {
-    background: var(--crimson);
-    color: var(--gold);
-    border-radius: 20px;
-    padding: 4px 14px;
-    font-size: 13px;
-  }
+  .topbar .title{ font-size:17px; letter-spacing:2px; }
+  .topbar .subtitle{ font-size:12px; opacity:.8; }
+  .conn-dot{ width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px; }
+  .conn-dot.ok{background:#28a745;} .conn-dot.ng{background:#e74c3c;}
 
-  /* ── LAYOUT ── */
-  .layout {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 16px;
-    padding: 16px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+  .layout{ display:grid; grid-template-columns:1fr 320px; gap:14px; padding:14px; max-width:1400px; margin:0 auto; }
 
-  /* ── CARD ── */
-  .card {
-    background: var(--crimson);
-    border: 1.5px solid var(--gold);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  .card h2 {
-    color: var(--gold);
-    font-size: 16px;
-    letter-spacing: 2px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid var(--gold);
-    padding-bottom: 8px;
-  }
+  .card{ background:var(--crimson); border:1.5px solid var(--gold); border-radius:8px; padding:18px; margin-bottom:14px; }
+  .card h2{ color:var(--gold); font-size:15px; letter-spacing:2px; margin-bottom:12px; border-bottom:1px solid var(--gold); padding-bottom:7px; }
 
-  /* ── WAITING ── */
-  .qr-wrap { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
-  .qr-wrap img { border: 3px solid var(--gold); border-radius: 6px; }
-  .qr-info { flex: 1; min-width: 200px; }
-  .url-box {
-    background: var(--dark);
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-size: 15px;
-    color: var(--gold-l);
-    word-break: break-all;
-    margin: 10px 0;
-  }
-  .player-count-big {
-    font-size: 56px;
-    font-weight: bold;
-    color: var(--gold);
-    text-align: center;
-    line-height: 1;
-  }
-  .player-count-label { text-align: center; color: var(--off-white); font-size: 14px; margin-top: 4px; }
+  .qr-wrap{ display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .qr-wrap img{ border:3px solid var(--gold); border-radius:6px; }
+  .qr-info{ flex:1; min-width:200px; }
+  .url-box{ background:var(--dark); border:1px solid var(--gold); border-radius:6px; padding:10px 12px; font-size:14px; color:var(--gold-l); word-break:break-all; margin:8px 0; }
+  .player-count-big{ font-size:54px; font-weight:bold; color:var(--gold); text-align:center; line-height:1; }
+  .player-count-label{ text-align:center; color:var(--off-white); font-size:13px; margin-top:3px; }
 
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-block;
-    padding: 12px 28px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-family: 'Georgia', serif;
-    font-weight: bold;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-    letter-spacing: 1px;
-  }
-  .btn:hover { opacity: .88; transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-  .btn-gold { background: var(--gold); color: var(--crimson); }
-  .btn-red  { background: #c0392b; color: white; }
-  .btn-dark { background: var(--dark); color: var(--gold); border: 1.5px solid var(--gold); }
-  .btn:disabled { opacity: .4; cursor: default; transform: none; }
-  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .btn{ display:inline-block; padding:11px 24px; border:none; border-radius:6px; font-size:15px; font-family:'Georgia',serif; font-weight:bold; cursor:pointer; transition:opacity .15s,transform .1s; letter-spacing:1px; }
+  .btn:hover{ opacity:.88; transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn-gold{ background:var(--gold); color:var(--crimson); }
+  .btn-red{ background:#c0392b; color:white; }
+  .btn-dark{ background:var(--dark); color:var(--gold); border:1.5px solid var(--gold); }
+  .btn:disabled{ opacity:.4; cursor:default; transform:none; }
+  .btn-row{ display:flex; gap:9px; flex-wrap:wrap; margin-top:12px; }
 
-  /* ── QUESTION DISPLAY ── */
-  .q-number { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-bottom: 8px; }
-  .q-text { font-size: 22px; color: var(--off-white); margin-bottom: 16px; line-height: 1.5; }
-  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .choice {
-    background: var(--dark);
-    border: 1.5px solid var(--gold);
-    border-radius: 6px;
-    padding: 12px 16px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background .3s;
-  }
-  .choice.correct { background: #155724; border-color: #28a745; }
-  .choice.wrong   { background: #3d0a0a; border-color: #c0392b; opacity: .6; }
-  .choice-label {
-    background: var(--gold);
-    color: var(--crimson);
-    font-weight: bold;
-    border-radius: 4px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
+  .q-number{ color:var(--gold); font-size:13px; letter-spacing:2px; margin-bottom:7px; }
+  .q-text{ font-size:20px; color:var(--off-white); margin-bottom:14px; line-height:1.5; }
+  .choices-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
+  .choice{ background:var(--dark); border:1.5px solid var(--gold); border-radius:6px; padding:11px 14px; font-size:14px; display:flex; align-items:center; gap:9px; transition:background .3s; }
+  .choice.correct{ background:#155724; border-color:#28a745; }
+  .choice.wrong{ background:#3d0a0a; border-color:#c0392b; opacity:.6; }
+  .choice-label{ background:var(--gold); color:var(--crimson); font-weight:bold; border-radius:4px; width:26px;height:26px; display:flex;align-items:center;justify-content:center; font-size:13px; flex-shrink:0; }
 
-  /* ── TIMER ── */
-  .timer-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .timer-num { font-size: 42px; font-weight: bold; color: var(--gold); min-width: 56px; }
-  .timer-bar-bg { flex: 1; height: 10px; background: var(--dark); border-radius: 5px; overflow: hidden; }
-  .timer-bar { height: 100%; background: var(--gold); border-radius: 5px; transition: width .1s linear; }
-  .timer-bar.danger { background: #e74c3c; }
+  .timer-wrap{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .timer-num{ font-size:40px; font-weight:bold; color:var(--gold); min-width:52px; }
+  .timer-bar-bg{ flex:1; height:10px; background:var(--dark); border-radius:5px; overflow:hidden; }
+  .timer-bar{ height:100%; background:var(--gold); border-radius:5px; transition:width .1s linear; }
+  .timer-bar.danger{ background:#e74c3c; }
 
-  /* ── ANSWER PROGRESS ── */
-  .progress-wrap { margin: 10px 0; }
-  .progress-text { font-size: 13px; color: var(--gold-l); margin-bottom: 6px; }
-  .progress-bg { background: var(--dark); border-radius: 4px; height: 8px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width .3s; }
+  .progress-wrap{ margin:8px 0; }
+  .progress-text{ font-size:13px; color:var(--gold-l); margin-bottom:5px; }
+  .progress-bg{ background:var(--dark); border-radius:4px; height:7px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--gold); border-radius:4px; transition:width .3s; }
 
-  /* ── RANKING ── */
-  .ranking-list { list-style: none; }
-  .ranking-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    background: var(--dark);
-    border: 1px solid rgba(201,168,76,.3);
-    transition: all .4s;
+  /* 今問の1位バナー */
+  .fastest-banner{
+    background:linear-gradient(135deg, #8B6914, #C9A84C, #8B6914);
+    border-radius:8px; padding:12px 16px; margin:10px 0;
+    display:flex; align-items:center; gap:10px;
+    animation: glowIn .5s ease;
   }
-  .ranking-item.top1 { border-color: var(--gold); background: rgba(201,168,76,.15); }
-  .ranking-item.top2 { border-color: #aaa; }
-  .ranking-item.top3 { border-color: #cd7f32; }
-  .rank-badge {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; font-size: 14px;
-    flex-shrink: 0;
-  }
-  .top1 .rank-badge { background: var(--gold); color: var(--crimson); }
-  .top2 .rank-badge { background: #aaa; color: #222; }
-  .top3 .rank-badge { background: #cd7f32; color: #fff; }
-  .rank-badge.other { background: var(--crimson2); color: var(--off-white); }
-  .rank-name { flex: 1; font-size: 15px; }
-  .rank-score { font-size: 18px; font-weight: bold; color: var(--gold); }
+  @keyframes glowIn{ from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+  .fastest-crown{ font-size:28px; }
+  .fastest-info{ flex:1; }
+  .fastest-label{ font-size:11px; color:var(--crimson); font-weight:bold; letter-spacing:1px; }
+  .fastest-name{ font-size:20px; font-weight:bold; color:var(--crimson); }
+  .fastest-time{ font-size:12px; color:var(--crimson); opacity:.8; }
 
-  /* ── SIDE PANEL ── */
-  .side { position: sticky; top: 16px; }
+  .ranking-list{ list-style:none; }
+  .ranking-item{ display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:6px;margin-bottom:7px;background:var(--dark);border:1px solid rgba(201,168,76,.3);transition:all .4s; }
+  .ranking-item.top1{ border-color:var(--gold);background:rgba(201,168,76,.15); }
+  .ranking-item.top2{ border-color:#aaa; }
+  .ranking-item.top3{ border-color:#cd7f32; }
+  .rank-badge{ width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0; }
+  .top1 .rank-badge{background:var(--gold);color:var(--crimson);}
+  .top2 .rank-badge{background:#aaa;color:#222;}
+  .top3 .rank-badge{background:#cd7f32;color:#fff;}
+  .rank-badge.other{background:var(--crimson2);color:var(--off-white);}
+  .rank-name{ flex:1; font-size:14px; }
+  .rank-score{ font-size:16px; font-weight:bold; color:var(--gold); }
 
-  /* ── SCREENS ── */
-  .screen { display: none; }
-  .screen.active { display: block; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
 
-  /* ── ANSWER RESULT ── */
-  .answer-summary {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 10px 0;
-  }
-  .answer-bar {
-    flex: 1;
-    min-width: 80px;
-    background: var(--dark);
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    padding: 10px;
-    text-align: center;
-  }
-  .answer-bar.correct-bar { border-color: #28a745; background: rgba(40,167,69,.15); }
-  .answer-bar .bar-label { font-size: 13px; color: var(--gold-l); }
-  .answer-bar .bar-count { font-size: 28px; font-weight: bold; color: var(--off-white); }
-  .answer-bar .bar-pct { font-size: 12px; color: #aaa; }
+  .answer-summary{ display:flex; gap:9px; flex-wrap:wrap; margin:9px 0; }
+  .answer-bar{ flex:1;min-width:70px;background:var(--dark);border:1px solid var(--gold);border-radius:6px;padding:9px;text-align:center; }
+  .answer-bar.correct-bar{ border-color:#28a745;background:rgba(40,167,69,.15); }
+  .answer-bar .bar-label{ font-size:12px;color:var(--gold-l); }
+  .answer-bar .bar-count{ font-size:26px;font-weight:bold;color:var(--off-white); }
+  .answer-bar .bar-pct{ font-size:11px;color:#aaa; }
 
-  /* ── CONNECTION ── */
-  .conn-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-  }
-  .conn-dot.ok { background: #28a745; }
-  .conn-dot.ng { background: #e74c3c; }
+  .side{ position:sticky; top:14px; }
 
-  /* ── FINISHED ── */
-  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 20px 0; }
-  .podium-item { text-align: center; }
-  .podium-block {
-    border-radius: 6px 6px 0 0;
-    width: 80px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; font-weight: bold; color: var(--crimson);
-  }
-  .podium-block.p1 { background: var(--gold); height: 90px; }
-  .podium-block.p2 { background: #aaa; height: 65px; }
-  .podium-block.p3 { background: #cd7f32; height: 50px; }
-  .podium-name { font-size: 13px; margin-top: 6px; color: var(--off-white); }
-  .podium-score { font-size: 12px; color: var(--gold-l); }
+  .podium{ display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:16px 0; }
+  .podium-item{ text-align:center; }
+  .podium-block{ border-radius:6px 6px 0 0;width:76px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;color:var(--crimson); }
+  .podium-block.p1{background:var(--gold);height:86px;}
+  .podium-block.p2{background:#aaa;height:62px;}
+  .podium-block.p3{background:#cd7f32;height:48px;}
+  .podium-name{ font-size:12px;margin-top:5px;color:var(--off-white); }
+  .podium-score{ font-size:11px;color:var(--gold-l); }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <span class="title">🎉 クイズ大会 幹事コントロール</span>
+  <div>
+    <div class="title">💍 あくと ＆ りりか　クイズ大会 幹事コントロール</div>
+    <div class="subtitle">Wedding Quiz Controller</div>
+  </div>
   <span id="conn-status"><span class="conn-dot ng" id="conn-dot"></span>未接続</span>
 </div>
 
 <div class="layout">
-  <!-- メイン -->
   <div class="main">
 
     <!-- WAITING -->
     <div class="screen active card" id="screen-waiting">
       <h2>📋 参加者受付中</h2>
       <div class="qr-wrap">
-        <img id="qr-img" src="" width="200" height="200" alt="QR">
+        <img id="qr-img" src="" width="190" height="190" alt="QR">
         <div class="qr-info">
-          <div style="margin-bottom:8px;color:var(--gold-l);font-size:14px;">参加者にこのQRコードを読み取ってもらってください</div>
+          <div style="margin-bottom:6px;color:var(--gold-l);font-size:13px;">参加者にQRコードを読み取ってもらってください</div>
           <div class="url-box" id="play-url">読み込み中...</div>
-          <div style="margin-top:14px;">
+          <div style="margin-top:12px;">
             <div class="player-count-big" id="waiting-count">0</div>
             <div class="player-count-label">人が参加中</div>
           </div>
           <div class="btn-row">
             <button class="btn btn-gold" id="btn-start" onclick="startQuiz()">クイズ開始！</button>
+            <button class="btn btn-dark" onclick="location.href='/admin'">⚙️ 問題編集</button>
           </div>
         </div>
       </div>
@@ -275,9 +150,7 @@
       <h2 id="q-header">第1問</h2>
       <div class="timer-wrap">
         <div class="timer-num" id="timer-num">20</div>
-        <div class="timer-bar-bg">
-          <div class="timer-bar" id="timer-bar" style="width:100%"></div>
-        </div>
+        <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
       </div>
       <div class="progress-wrap">
         <div class="progress-text" id="progress-text">回答 0 / 0 人</div>
@@ -295,6 +168,7 @@
       <h2 id="ans-header">第1問 正解発表</h2>
       <div class="q-text" id="ans-q-text"></div>
       <div class="choices-grid" id="ans-choices"></div>
+      <div id="fastest-wrap"></div>
       <div class="answer-summary" id="answer-summary"></div>
       <div class="btn-row">
         <button class="btn btn-dark" onclick="showRanking()">ランキングを表示</button>
@@ -314,24 +188,23 @@
 
     <!-- FINISHED -->
     <div class="screen card" id="screen-finished">
-      <h2>🎊 最終結果</h2>
+      <h2>🎊 最終結果 — あくと ＆ りりか ウェディングクイズ</h2>
       <div class="podium" id="podium"></div>
       <ul class="ranking-list" id="final-ranking"></ul>
     </div>
 
   </div>
 
-  <!-- サイドパネル -->
   <div class="side">
     <div class="card">
       <h2>👑 リアルタイムランキング</h2>
       <ul class="ranking-list" id="side-ranking">
-        <li style="color:#aaa;font-size:14px;text-align:center;padding:20px 0;">参加者を待っています</li>
+        <li style="color:#aaa;font-size:13px;text-align:center;padding:16px 0;">参加者を待っています</li>
       </ul>
     </div>
-    <div class="card" style="margin-top:0;">
+    <div class="card" style="margin-top:0">
       <h2>📊 ゲーム状況</h2>
-      <div style="font-size:14px;line-height:2;">
+      <div style="font-size:13px;line-height:2.1;">
         <div>参加者：<strong id="info-players" style="color:var(--gold)">0</strong> 人</div>
         <div>進行：<strong id="info-q" style="color:var(--gold)">-</strong></div>
         <div>フェーズ：<strong id="info-phase" style="color:var(--gold)">待機中</strong></div>
@@ -341,260 +214,207 @@
 </div>
 
 <script>
-const WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host;
-let ws, timerInterval;
-let currentQ = -1, totalQ = 0, playerCount = 0;
-let questionStartTime = null, timeLimit = 20;
-const LABELS = ['A','B','C','D'];
+const WS_URL=(location.protocol==='https:'?'wss://':'ws://')+location.host;
+const LABELS=['A','B','C','D'];
+let ws,timerInterval;
+let currentQ=-1,totalQ=0,playerCount=0;
+let questionStartTime=null,timeLimit=20;
 
-// ── WS ─────────────────────────────────────────────────────
-function connect() {
-  ws = new WebSocket(WS_URL);
-
-  ws.onopen = () => {
-    setConn(true);
-    ws.send(JSON.stringify({ type: 'host_join' }));
-    loadQR();
-  };
-
-  ws.onclose = () => {
-    setConn(false);
-    setTimeout(connect, 2000);
-  };
-
-  ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    switch (msg.type) {
+function connect(){
+  ws=new WebSocket(WS_URL);
+  ws.onopen=()=>{ setConn(true); ws.send(JSON.stringify({type:'host_join'})); loadQR(); };
+  ws.onclose=()=>{ setConn(false); setTimeout(connect,2000); };
+  ws.onmessage=(e)=>{
+    const msg=JSON.parse(e.data);
+    switch(msg.type){
       case 'host_joined':
-        playerCount = msg.playerCount;
-        totalQ = msg.totalQ;
-        updateInfo();
-        updateSideRanking(msg.ranking);
-        break;
-
+        playerCount=msg.playerCount; totalQ=msg.totalQ;
+        updateInfo(); updateSideRanking(msg.ranking); break;
       case 'player_count':
-        playerCount = msg.count;
-        document.getElementById('waiting-count').textContent = msg.count;
-        updateInfo();
-        break;
-
-      case 'question_start':
-        showQuestion(msg.question);
-        break;
-
-      case 'answer_progress':
-        updateProgress(msg.answered, msg.total);
-        break;
-
-      case 'answer_reveal':
-        showAnswerReveal(msg);
-        break;
-
-      case 'ranking':
-        showRankingScreen(msg.ranking);
-        break;
-
-      case 'game_finished':
-        showFinished(msg.ranking);
-        break;
+        playerCount=msg.count;
+        document.getElementById('waiting-count').textContent=msg.count;
+        updateInfo(); break;
+      case 'question_start': showQuestion(msg.question); break;
+      case 'answer_progress': updateProgress(msg.answered,msg.total); break;
+      case 'answer_reveal': showAnswerReveal(msg); break;
+      case 'ranking': showRankingScreen(msg.ranking); break;
+      case 'game_finished': showFinished(msg.ranking); break;
     }
   };
 }
 
-function setConn(ok) {
-  document.getElementById('conn-dot').className = 'conn-dot ' + (ok ? 'ok' : 'ng');
-  document.getElementById('conn-status').childNodes[1].textContent = ok ? '接続中' : '再接続中...';
+function setConn(ok){
+  document.getElementById('conn-dot').className='conn-dot '+(ok?'ok':'ng');
+  document.getElementById('conn-status').childNodes[1].textContent=ok?'接続中':'再接続中...';
 }
 
-// ── QR ─────────────────────────────────────────────────────
-async function loadQR() {
-  const res = await fetch('/api/qr');
-  const data = await res.json();
-  document.getElementById('qr-img').src = data.qr;
-  document.getElementById('play-url').textContent = data.url;
+async function loadQR(){
+  const res=await fetch('/api/qr');
+  const data=await res.json();
+  document.getElementById('qr-img').src=data.qr;
+  document.getElementById('play-url').textContent=data.url;
 }
 
-// ── SCREENS ────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function startQuiz() {
-  if (playerCount === 0 && !confirm('参加者が0人ですが開始しますか？')) return;
-  ws.send(JSON.stringify({ type: 'next_question' }));
+function startQuiz(){
+  if(playerCount===0&&!confirm('参加者が0人ですが開始しますか？')) return;
+  ws.send(JSON.stringify({type:'next_question'}));
 }
 
-function showQuestion(q) {
-  currentQ = q.index;
-  timeLimit = q.timeLimit;
-  questionStartTime = Date.now();
+function showQuestion(q){
+  currentQ=q.index; timeLimit=q.timeLimit;
+  questionStartTime=Date.now();
   showScreen('screen-question');
-  document.getElementById('q-header').textContent = `第${q.index+1}問 / 全${q.total}問`;
-  document.getElementById('q-text').textContent = q.question;
-  document.getElementById('info-phase').textContent = `第${q.index+1}問 回答中`;
-
-  const grid = document.getElementById('choices-display');
-  grid.innerHTML = '';
-  q.choices.forEach((c, i) => {
-    const div = document.createElement('div');
-    div.className = 'choice';
-    div.id = 'choice-' + i;
-    div.innerHTML = `<span class="choice-label">${LABELS[i]}</span><span>${c}</span>`;
+  document.getElementById('q-header').textContent=`第${q.index+1}問 / 全${q.total}問`;
+  document.getElementById('q-text').textContent=q.question;
+  document.getElementById('info-phase').textContent=`第${q.index+1}問 回答中`;
+  const grid=document.getElementById('choices-display');
+  grid.innerHTML='';
+  q.choices.forEach((c,i)=>{
+    const div=document.createElement('div');
+    div.className='choice'; div.id='choice-'+i;
+    div.innerHTML=`<span class="choice-label">${LABELS[i]}</span><span>${c}</span>`;
     grid.appendChild(div);
   });
-
-  updateProgress(0, playerCount);
+  updateProgress(0,playerCount);
   startTimer();
 }
 
-function startTimer() {
+function startTimer(){
   clearInterval(timerInterval);
-  const bar = document.getElementById('timer-bar');
-  const num = document.getElementById('timer-num');
-  timerInterval = setInterval(() => {
-    const elapsed = (Date.now() - questionStartTime) / 1000;
-    const remaining = Math.max(0, timeLimit - elapsed);
-    const pct = (remaining / timeLimit) * 100;
-    num.textContent = Math.ceil(remaining);
-    bar.style.width = pct + '%';
-    bar.className = 'timer-bar' + (remaining < 7 ? ' danger' : '');
-    if (remaining <= 0) clearInterval(timerInterval);
-  }, 100);
+  const bar=document.getElementById('timer-bar');
+  const num=document.getElementById('timer-num');
+  timerInterval=setInterval(()=>{
+    const elapsed=(Date.now()-questionStartTime)/1000;
+    const remaining=Math.max(0,timeLimit-elapsed);
+    num.textContent=Math.ceil(remaining);
+    bar.style.width=(remaining/timeLimit*100)+'%';
+    bar.className='timer-bar'+(remaining<7?' danger':'');
+    if(remaining<=0) clearInterval(timerInterval);
+  },100);
 }
 
-function updateProgress(answered, total) {
-  document.getElementById('progress-text').textContent = `回答 ${answered} / ${total} 人`;
-  const pct = total > 0 ? (answered / total * 100) : 0;
-  document.getElementById('progress-fill').style.width = pct + '%';
+function updateProgress(answered,total){
+  document.getElementById('progress-text').textContent=`回答 ${answered} / ${total} 人`;
+  const pct=total>0?(answered/total*100):0;
+  document.getElementById('progress-fill').style.width=pct+'%';
 }
 
-function revealAnswer() {
-  clearInterval(timerInterval);
-  ws.send(JSON.stringify({ type: 'reveal_answer' }));
-}
+function revealAnswer(){ clearInterval(timerInterval); ws.send(JSON.stringify({type:'reveal_answer'})); }
 
-function showAnswerReveal(msg) {
+function showAnswerReveal(msg){
   clearInterval(timerInterval);
   showScreen('screen-answer');
+  const correct=msg.correct;
+  document.getElementById('ans-header').textContent=`第${currentQ+1}問 正解発表`;
+  document.getElementById('ans-q-text').textContent=document.getElementById('q-text').textContent;
+  document.getElementById('info-phase').textContent=`第${currentQ+1}問 正解発表`;
 
-  // 問題を再表示
-  const q = document.getElementById('q-text').textContent;
-  document.getElementById('ans-header').textContent = `第${currentQ+1}問 正解発表`;
-  document.getElementById('ans-q-text').textContent = q;
-  document.getElementById('info-phase').textContent = `第${currentQ+1}問 正解発表`;
-
-  // 選択肢に正解マーク
-  const choices = document.getElementById('choices-display').querySelectorAll('.choice');
-  const ansCont = document.getElementById('ans-choices');
-  ansCont.innerHTML = '';
-  choices.forEach((c, i) => {
-    const div = c.cloneNode(true);
-    if (i === msg.correct) div.classList.add('correct');
-    else div.classList.add('wrong');
+  const choices=document.getElementById('choices-display').querySelectorAll('.choice');
+  const ansCont=document.getElementById('ans-choices');
+  ansCont.innerHTML='';
+  choices.forEach((c,i)=>{
+    const div=c.cloneNode(true);
+    div.classList.add(i===correct?'correct':'wrong');
     ansCont.appendChild(div);
   });
 
-  // 選択肢ごとの回答数集計
-  const counts = [0,0,0,0];
-  const total = Object.keys(msg.answers).length;
-  Object.values(msg.answers).forEach(a => { if (a.choice >= 0 && a.choice <= 3) counts[a.choice]++; });
-  const summary = document.getElementById('answer-summary');
-  summary.innerHTML = '';
-  counts.forEach((cnt, i) => {
-    const pct = total > 0 ? Math.round(cnt/total*100) : 0;
-    const div = document.createElement('div');
-    div.className = 'answer-bar' + (i === msg.correct ? ' correct-bar' : '');
-    div.innerHTML = `<div class="bar-label">${LABELS[i]}</div><div class="bar-count">${cnt}</div><div class="bar-pct">${pct}%</div>`;
+  // 今問の最速正解者バナー
+  const fastWrap=document.getElementById('fastest-wrap');
+  if(msg.fastest){
+    fastWrap.innerHTML=`
+      <div class="fastest-banner">
+        <div class="fastest-crown">⚡</div>
+        <div class="fastest-info">
+          <div class="fastest-label">今問の最速正解者</div>
+          <div class="fastest-name">🥇 ${esc(msg.fastest.name)}</div>
+          <div class="fastest-time">${(msg.fastest.timeMs/1000).toFixed(2)}秒で正解！</div>
+        </div>
+      </div>`;
+  } else {
+    fastWrap.innerHTML='<div style="text-align:center;color:#888;font-size:13px;padding:8px 0;">今問は正解者なし</div>';
+  }
+
+  // 回答分布
+  const counts=[0,0,0,0];
+  const total=Object.keys(msg.answers).length;
+  Object.values(msg.answers).forEach(a=>{ if(a.choice>=0&&a.choice<=3) counts[a.choice]++; });
+  const summary=document.getElementById('answer-summary');
+  summary.innerHTML='';
+  counts.forEach((cnt,i)=>{
+    const pct=total>0?Math.round(cnt/total*100):0;
+    const div=document.createElement('div');
+    div.className='answer-bar'+(i===correct?' correct-bar':'');
+    div.innerHTML=`<div class="bar-label">${LABELS[i]}</div><div class="bar-count">${cnt}</div><div class="bar-pct">${pct}%</div>`;
     summary.appendChild(div);
   });
 
-  // 次問ボタンのラベル
-  const isLast = currentQ >= totalQ - 1;
-  document.getElementById('btn-next').textContent = isLast ? '最終ランキングへ' : '次の問題へ';
+  const isLast=currentQ>=totalQ-1;
+  document.getElementById('btn-next').textContent=isLast?'最終ランキングへ':'次の問題へ';
   updateSideRanking(msg.ranking);
 }
 
-function showRanking() {
-  ws.send(JSON.stringify({ type: 'show_ranking' }));
-}
+function showRanking(){ ws.send(JSON.stringify({type:'show_ranking'})); }
 
-function showRankingScreen(ranking) {
+function showRankingScreen(ranking){
   showScreen('screen-ranking');
-  document.getElementById('info-phase').textContent = 'ランキング表示中';
-  const isLast = currentQ >= totalQ - 1;
-  document.getElementById('btn-next2').textContent = isLast ? '最終結果を見る' : '次の問題へ';
-  renderRanking('main-ranking', ranking, true);
+  document.getElementById('info-phase').textContent='ランキング表示中';
+  const isLast=currentQ>=totalQ-1;
+  document.getElementById('btn-next2').textContent=isLast?'最終結果を見る':'次の問題へ';
+  renderRanking('main-ranking',ranking,true);
   updateSideRanking(ranking);
 }
 
-function nextQuestion() {
-  ws.send(JSON.stringify({ type: 'next_question' }));
-}
+function nextQuestion(){ ws.send(JSON.stringify({type:'next_question'})); }
+function finishGame(){ ws.send(JSON.stringify({type:'next_question'})); }
 
-function finishGame() {
-  ws.send(JSON.stringify({ type: 'next_question' })); // triggers finish if out of questions
-}
-
-function showFinished(ranking) {
+function showFinished(ranking){
   showScreen('screen-finished');
-  document.getElementById('info-phase').textContent = '終了';
-
-  // podium top 3
-  const podium = document.getElementById('podium');
-  podium.innerHTML = '';
-  const order = [1, 0, 2]; // 2nd, 1st, 3rd display order
-  order.forEach(idx => {
-    if (!ranking[idx]) return;
-    const p = ranking[idx];
-    const cls = ['p1','p2','p3'][idx];
-    const label = ['🥇','🥈','🥉'][idx];
-    const div = document.createElement('div');
-    div.className = 'podium-item';
-    div.innerHTML = `<div class="podium-block ${cls}">${label}</div>
-      <div class="podium-name">${esc(p.name)}</div>
-      <div class="podium-score">${p.score}pts</div>`;
+  document.getElementById('info-phase').textContent='終了';
+  const podium=document.getElementById('podium');
+  podium.innerHTML='';
+  [1,0,2].forEach(idx=>{
+    if(!ranking[idx]) return;
+    const p=ranking[idx];
+    const cls=['p1','p2','p3'][idx];
+    const label=['🥇','🥈','🥉'][idx];
+    const div=document.createElement('div');
+    div.className='podium-item';
+    div.innerHTML=`<div class="podium-block ${cls}">${label}</div><div class="podium-name">${esc(p.name)}</div><div class="podium-score">${p.score}pts</div>`;
     podium.appendChild(div);
   });
-
-  renderRanking('final-ranking', ranking, true);
+  renderRanking('final-ranking',ranking,true);
 }
 
-function updateSideRanking(ranking) {
-  renderRanking('side-ranking', ranking, false);
-  updateInfo();
-}
+function updateSideRanking(ranking){ renderRanking('side-ranking',ranking,false); updateInfo(); }
 
-function renderRanking(elId, ranking, showAll) {
-  const ul = document.getElementById(elId);
-  ul.innerHTML = '';
-  const list = showAll ? ranking : ranking.slice(0, 10);
-  if (list.length === 0) {
-    ul.innerHTML = '<li style="color:#aaa;font-size:14px;text-align:center;padding:16px;">まだ参加者がいません</li>';
-    return;
-  }
-  list.forEach((p) => {
-    const cls = p.rank === 1 ? 'top1' : p.rank === 2 ? 'top2' : p.rank === 3 ? 'top3' : '';
-    const badgeCls = p.rank <= 3 ? '' : 'other';
-    const medal = p.rank === 1 ? '🥇' : p.rank === 2 ? '🥈' : p.rank === 3 ? '🥉' : p.rank;
-    const li = document.createElement('li');
-    li.className = 'ranking-item ' + cls;
-    li.innerHTML = `<div class="rank-badge ${badgeCls}">${medal}</div>
-      <div class="rank-name">${esc(p.name)}</div>
-      <div class="rank-score">${p.score}<span style="font-size:11px;color:#aaa">pts</span></div>`;
+function renderRanking(elId,ranking,showAll){
+  const ul=document.getElementById(elId);
+  ul.innerHTML='';
+  const list=showAll?ranking:ranking.slice(0,10);
+  if(!list.length){ ul.innerHTML='<li style="color:#aaa;font-size:13px;text-align:center;padding:14px 0;">まだ参加者がいません</li>'; return; }
+  list.forEach(p=>{
+    const cls=p.rank===1?'top1':p.rank===2?'top2':p.rank===3?'top3':'';
+    const badgeCls=p.rank<=3?'':'other';
+    const medal=p.rank===1?'🥇':p.rank===2?'🥈':p.rank===3?'🥉':p.rank;
+    const li=document.createElement('li');
+    li.className='ranking-item '+cls;
+    li.innerHTML=`<div class="rank-badge ${badgeCls}">${medal}</div><div class="rank-name">${esc(p.name)}</div><div class="rank-score">${p.score}<span style="font-size:10px;color:#aaa">pts</span></div>`;
     ul.appendChild(li);
   });
 }
 
-function updateInfo() {
-  document.getElementById('info-players').textContent = playerCount;
-  document.getElementById('info-q').textContent = currentQ >= 0 ? `第${currentQ+1}問 / 全${totalQ}問` : '-';
-  document.getElementById('waiting-count').textContent = playerCount;
+function updateInfo(){
+  document.getElementById('info-players').textContent=playerCount;
+  document.getElementById('info-q').textContent=currentQ>=0?`第${currentQ+1}問 / 全${totalQ}問`:'-';
+  document.getElementById('waiting-count').textContent=playerCount;
 }
 
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 connect();
 </script>
