@@ -11,7 +11,12 @@ const wss = new WebSocket.Server({ server });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-
+app.get('/host', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'host.html'));
+});
+app.get('/play', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'play.html'));
+});
 // ─── ゲーム状態 ───────────────────────────────────────────
 const QUESTION_TIME = 20; // 秒
 const MAX_POINTS = 1000;
