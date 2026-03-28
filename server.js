@@ -11,7 +11,6 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// ─── 問題読み込み ─────────────────────────────────────────
 function loadQuestions() {
   try {
     delete require.cache[require.resolve('./questions')];
@@ -23,12 +22,10 @@ function loadQuestions() {
 }
 let questions = loadQuestions();
 
-// ─── 設定 ─────────────────────────────────────────────────
 const QUESTION_TIME = 20;
 const MAX_POINTS = 1000;
 const MIN_POINTS = 100;
 
-// ─── ゲーム状態 ───────────────────────────────────────────
 let gameState = {
   phase: 'waiting',
   currentQ: -1,
@@ -37,9 +34,9 @@ let gameState = {
   players: {},
   hostId: null,
   fastestAnswer: null,
+  previousRanking: [],
 };
 
-// ─── ユーティリティ ────────────────────────────────────────
 function broadcast(data, excludeId = null) {
   const msg = JSON.stringify(data);
   wss.clients.forEach(ws => {
@@ -59,6 +56,15 @@ function getRanking() {
     .map(([id, p]) => ({ id, name: p.name, score: p.score }))
     .sort((a, b) => b.score - a.score)
     .map((p, i) => ({ ...p, rank: i + 1 }));
+}
+
+function getRankingWithDelta(prev) {
+  const current = getRanking();
+  return current.map(p => {
+    const prevEntry = prev.find(pp => pp.id === p.id);
+    const delta = prevEntry ? prevEntry.rank - p.rank : 0;
+    return { ...p, delta };
+  });
 }
 
 function calcPoints(timeMs) {
@@ -82,7 +88,24 @@ function makeSessionKey() {
   return Math.random().toString(36).slice(2, 12);
 }
 
-// ─── WebSocket ────────────────────────────────────────────
+function resetGame() {
+  gameState = {
+    phase: 'waiting',
+    currentQ: -1,
+    questionStart: null,
+    answers: {},
+    players: {},
+    hostId: null,
+    fastestAnswer: null,
+    previousRanking: [],
+  };
+  questions = loadQuestions();
+}
+
+function getPlayerCount() {
+  return Object.values(gameState.players).filter(p => !p.isHost).length;
+}
+
 wss.on('connection', (ws) => {
   ws.playerId = Math.random().toString(36).slice(2, 10);
 
@@ -100,7 +123,7 @@ wss.on('connection', (ws) => {
         sendTo(ws, {
           type: 'host_joined',
           playerId: ws.playerId,
-          playerCount: Object.values(gameState.players).filter(p => !p.isHost).length,
+          playerCount: getPlayerCount(),
           ranking: getRanking(),
           phase: gameState.phase,
           currentQ: gameState.currentQ,
@@ -115,6 +138,7 @@ wss.on('connection', (ws) => {
         ws.playerName = name;
         ws.sessionKey = sessionKey;
         gameState.players[ws.playerId] = { name, score: 0, isHost: false, connected: true, sessionKey };
+        const count = getPlayerCount();
         sendTo(ws, {
           type: 'joined',
           playerId: ws.playerId,
@@ -122,19 +146,19 @@ wss.on('connection', (ws) => {
           name,
           score: 0,
           phase: gameState.phase,
+          playerCount: count,
           ...(gameState.phase === 'question' ? {
             question: getQuestionForClient(gameState.currentQ),
             elapsed: Date.now() - gameState.questionStart,
           } : {}),
           ...(gameState.phase === 'answer' || gameState.phase === 'ranking' ? {
-            ranking: getRanking(),
+            ranking: getRankingWithDelta(gameState.previousRanking),
           } : {}),
         });
-        broadcast({ type: 'player_count', count: Object.values(gameState.players).filter(p => !p.isHost).length });
+        broadcast({ type: 'player_count', count });
         break;
       }
 
-      // 再接続（点数復元）
       case 'player_reconnect': {
         const { sessionKey, name } = msg;
         const existing = Object.entries(gameState.players).find(
@@ -147,7 +171,6 @@ wss.on('connection', (ws) => {
           gameState.players[ws.playerId] = player;
           ws.playerName = player.name;
           ws.sessionKey = sessionKey;
-          // 回答済みデータも新IDに移行
           if (gameState.answers[oldId]) {
             gameState.answers[ws.playerId] = gameState.answers[oldId];
             delete gameState.answers[oldId];
@@ -159,7 +182,7 @@ wss.on('connection', (ws) => {
             name: player.name,
             score: player.score,
             phase: gameState.phase,
-            ranking: getRanking(),
+            ranking: getRankingWithDelta(gameState.previousRanking),
             ...(gameState.phase === 'question' ? {
               question: getQuestionForClient(gameState.currentQ),
               elapsed: Date.now() - gameState.questionStart,
@@ -172,9 +195,9 @@ wss.on('connection', (ws) => {
           ws.playerName = newName;
           ws.sessionKey = newKey;
           gameState.players[ws.playerId] = { name: newName, score: 0, isHost: false, connected: true, sessionKey: newKey };
-          sendTo(ws, { type: 'joined', playerId: ws.playerId, sessionKey: newKey, name: newName, score: 0, phase: gameState.phase });
+          sendTo(ws, { type: 'joined', playerId: ws.playerId, sessionKey: newKey, name: newName, score: 0, phase: gameState.phase, playerCount: getPlayerCount() });
         }
-        broadcast({ type: 'player_count', count: Object.values(gameState.players).filter(p => !p.isHost).length });
+        broadcast({ type: 'player_count', count: getPlayerCount() });
         break;
       }
 
@@ -183,20 +206,31 @@ wss.on('connection', (ws) => {
         const nextIdx = gameState.currentQ + 1;
         if (nextIdx >= questions.length) {
           gameState.phase = 'finished';
-          broadcast({ type: 'game_finished', ranking: getRanking() });
+          broadcast({ type: 'game_finished', ranking: getRankingWithDelta(gameState.previousRanking) });
           break;
         }
+        gameState.previousRanking = getRanking();
         gameState.currentQ = nextIdx;
-        gameState.phase = 'question';
-        gameState.questionStart = Date.now();
+        gameState.phase = 'countdown';
         gameState.answers = {};
         gameState.fastestAnswer = null;
-        broadcast({ type: 'question_start', question: getQuestionForClient(nextIdx) });
+
+        // 3秒カウントダウン後に問題開始
+        broadcast({ type: 'countdown_start', questionIndex: nextIdx, total: questions.length });
+
         setTimeout(() => {
-          if (gameState.currentQ === nextIdx && gameState.phase === 'question') {
-            revealAnswer(nextIdx);
+          if (gameState.currentQ === nextIdx) {
+            gameState.phase = 'question';
+            gameState.questionStart = Date.now();
+            broadcast({ type: 'question_start', question: getQuestionForClient(nextIdx) });
+
+            setTimeout(() => {
+              if (gameState.currentQ === nextIdx && gameState.phase === 'question') {
+                revealAnswer(nextIdx);
+              }
+            }, QUESTION_TIME * 1000 + 500);
           }
-        }, QUESTION_TIME * 1000 + 500);
+        }, 3000);
         break;
       }
 
@@ -209,7 +243,14 @@ wss.on('connection', (ws) => {
       case 'show_ranking': {
         if (!ws.isHost) break;
         gameState.phase = 'ranking';
-        broadcast({ type: 'ranking', ranking: getRanking() });
+        broadcast({ type: 'ranking', ranking: getRankingWithDelta(gameState.previousRanking) });
+        break;
+      }
+
+      case 'reset_game': {
+        if (!ws.isHost) break;
+        resetGame();
+        broadcast({ type: 'game_reset' });
         break;
       }
 
@@ -221,7 +262,7 @@ wss.on('connection', (ws) => {
         gameState.answers[ws.playerId] = { choice: msg.choice, timeMs };
         sendTo(ws, { type: 'answer_received', choice: msg.choice });
         const answerCount = Object.keys(gameState.answers).length;
-        const playerCount = Object.values(gameState.players).filter(p => !p.isHost).length;
+        const playerCount = getPlayerCount();
         broadcast({ type: 'answer_progress', answered: answerCount, total: playerCount });
         break;
       }
@@ -251,6 +292,8 @@ function revealAnswer(qIdx) {
   gameState.phase = 'answer';
   const correct = questions[qIdx].correct;
   let fastest = null;
+  let totalTimeMs = 0;
+  let correctCount = 0;
 
   Object.entries(gameState.answers).forEach(([pid, ans]) => {
     if (ans.choice === correct) {
@@ -259,6 +302,8 @@ function revealAnswer(qIdx) {
         gameState.players[pid].score += pts;
         ans.points = pts;
       }
+      totalTimeMs += ans.timeMs;
+      correctCount++;
       if (!fastest || ans.timeMs < fastest.timeMs) {
         fastest = { name: gameState.players[pid]?.name || '?', timeMs: ans.timeMs };
       }
@@ -266,17 +311,23 @@ function revealAnswer(qIdx) {
   });
 
   gameState.fastestAnswer = fastest;
+  const avgTimeMs = correctCount > 0 ? Math.round(totalTimeMs / correctCount) : null;
+  const totalAnswered = Object.keys(gameState.answers).length;
+  const correctRate = totalAnswered > 0 ? Math.round(correctCount / totalAnswered * 100) : 0;
 
   broadcast({
     type: 'answer_reveal',
     correct,
     answers: gameState.answers,
-    ranking: getRanking(),
+    ranking: getRankingWithDelta(gameState.previousRanking),
     fastest,
+    avgTimeMs,
+    correctRate,
+    correctCount,
+    totalAnswered,
   });
 }
 
-// ─── HTTP API ─────────────────────────────────────────────
 app.get('/api/qr', async (req, res) => {
   const host = req.headers.host;
   const proto = req.headers['x-forwarded-proto'] || 'http';
@@ -293,7 +344,7 @@ app.get('/api/questions', (req, res) => res.json(questions));
 app.get('/api/state', (req, res) => res.json({
   phase: gameState.phase, currentQ: gameState.currentQ,
   totalQ: questions.length,
-  playerCount: Object.values(gameState.players).filter(p => !p.isHost).length,
+  playerCount: getPlayerCount(),
   ranking: getRanking(),
 }));
 
@@ -305,6 +356,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n🎉 Wedding Quiz Server running on port ${PORT}`);
   console.log(`   幹事画面:   http://localhost:${PORT}/host`);
-  console.log(`   参加者画面: http://localhost:${PORT}/play`);
-  console.log(`   管理画面:   http://localhost:${PORT}/admin\n`);
+  console.log(`   参加者画面: http://localhost:${PORT}/play\n`);
 });

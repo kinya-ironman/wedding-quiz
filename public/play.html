@@ -3,191 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💍 あくと ＆ りりか クイズ大会</title>
+<title>💍 あくと & りりか クイズ大会</title>
 <style>
-  :root {
-    --crimson: #6B0010; --crimson2: #8B0020; --gold: #C9A84C;
-    --gold-l: #E8D08A; --off-white: #F5EED8; --dark: #1a0005;
-    --green: #1a7a34; --red: #a71d2a;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; font-family: 'Georgia', serif; background: var(--dark); color: var(--off-white); overflow: hidden; }
+:root { --green:#00A878; --red:#FF5964; --yellow:#FFB800; --purple:#7B68EE; --dark:#0D3D2E; --light:#F0FBF7; --mint:#B8EAD9; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: 'system-ui', -apple-system, sans-serif; background: var(--light); color: var(--dark); overflow: hidden; }
 
-  .topbar {
-    background: var(--gold); color: var(--crimson);
-    text-align: center; font-weight: bold; font-size: 13px;
-    padding: 8px; letter-spacing: 1px; line-height: 1.4;
-  }
-  .topbar .names { font-size: 16px; letter-spacing: 3px; }
+.topbar { background: var(--green); color: #fff; text-align: center; padding: 9px; }
+.topbar .names { font-size: 15px; font-weight: 700; letter-spacing: 2px; }
+.topbar .sub   { font-size: 11px; opacity: .8; margin-top: 1px; }
 
-  .screen { display: none; height: calc(100vh - 52px); overflow-y: auto; padding: 20px 16px; }
-  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.screen { display: none; height: calc(100vh - 52px); overflow-y: auto; padding: 20px 16px; }
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.q-screen { align-items: stretch; justify-content: flex-start; padding: 10px 12px; }
 
-  /* JOIN */
-  .logo { font-size: 44px; margin-bottom: 6px; }
-  .logo-title { font-size: 20px; color: var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 4px; text-align: center; }
-  .logo-sub { font-size: 13px; color: var(--gold-l); margin-bottom: 24px; text-align: center; }
-  .input-label { font-size: 13px; color: var(--gold-l); margin-bottom: 8px; letter-spacing: 1px; }
-  .name-input {
-    width: 100%; max-width: 320px; padding: 14px 16px;
-    font-size: 18px; font-family: 'Georgia', serif;
-    background: var(--crimson); border: 2px solid var(--gold);
-    border-radius: 8px; color: var(--off-white); text-align: center; outline: none; margin-bottom: 14px;
-  }
-  .name-input::placeholder { color: rgba(245,238,216,.4); }
-  .btn {
-    width: 100%; max-width: 320px; padding: 16px;
-    font-size: 18px; font-family: 'Georgia', serif; font-weight: bold;
-    border: none; border-radius: 8px; cursor: pointer; letter-spacing: 2px;
-    transition: opacity .15s, transform .1s;
-  }
-  .btn:active { transform: scale(.97); }
-  .btn-gold { background: var(--gold); color: var(--crimson); }
-  .btn:disabled { opacity: .5; }
+/* JOIN */
+.logo { font-size: 44px; margin-bottom: 6px; }
+.logo-title { font-size: 20px; color: var(--green); font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; text-align: center; }
+.logo-sub { font-size: 13px; color: #4DAA8A; margin-bottom: 24px; text-align: center; }
+.input-label { font-size: 13px; color: #4DAA8A; margin-bottom: 8px; font-weight: 600; }
+.name-input { width: 100%; max-width: 320px; padding: 14px 16px; font-size: 18px; font-family: system-ui, sans-serif; background: #fff; border: 2px solid var(--mint); border-radius: 10px; color: var(--dark); text-align: center; outline: none; margin-bottom: 14px; }
+.name-input:focus { border-color: var(--green); }
+.name-input::placeholder { color: #aaa; }
+.btn { width: 100%; max-width: 320px; padding: 15px; font-size: 17px; font-family: system-ui, sans-serif; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; transition: opacity .15s, transform .1s; letter-spacing: 1px; }
+.btn:active { transform: scale(.97); }
+.btn-green { background: var(--green); color: #fff; }
+.btn:disabled { opacity: .5; }
 
-  /* WAITING */
-  .wait-emoji { font-size: 52px; margin-bottom: 10px; }
-  .wait-name { font-size: 22px; color: var(--gold); font-weight: bold; margin-bottom: 8px; text-align: center; }
-  .wait-msg { font-size: 15px; color: var(--off-white); text-align: center; line-height: 1.8; }
-  .wait-dot { display: inline-block; animation: blink 1s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+/* WAITING */
+.wait-emoji { font-size: 52px; margin-bottom: 10px; }
+.wait-name { font-size: 22px; color: var(--green); font-weight: 700; margin-bottom: 8px; text-align: center; }
+.wait-msg { font-size: 15px; color: var(--dark); text-align: center; line-height: 1.8; }
+.wait-dot { display: inline-block; animation: blink 1s infinite; }
+.player-badge { background: var(--green); color: #fff; border-radius: 20px; padding: 6px 18px; font-size: 14px; font-weight: 700; margin-top: 16px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-  /* QUESTION */
-  .q-screen { align-items: stretch; justify-content: flex-start; padding: 10px 12px; }
-  .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .q-num { font-size: 13px; color: var(--gold-l); letter-spacing: 1px; }
-  .timer-badge {
-    background: var(--crimson2); border: 2px solid var(--gold);
-    border-radius: 20px; padding: 4px 14px;
-    font-size: 18px; font-weight: bold; color: var(--gold); min-width: 54px; text-align: center;
-    transition: all .3s;
-  }
-  .timer-badge.danger { color: #e74c3c; border-color: #e74c3c; animation: pulse 0.5s infinite; }
-  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+/* COUNTDOWN */
+.cd-wrap { text-align: center; }
+.cd-label { font-size: 16px; color: #4DAA8A; font-weight: 600; margin-bottom: 12px; letter-spacing: 1px; }
+.cd-num { font-size: 120px; font-weight: 800; color: var(--green); line-height: 1; animation: cdPop .4s ease; }
+.cd-sub { font-size: 15px; color: #4DAA8A; margin-top: 10px; }
+@keyframes cdPop { from{transform:scale(1.4);opacity:0} to{transform:scale(1);opacity:1} }
 
-  .q-text-box {
-    background: var(--crimson); border: 1.5px solid var(--gold); border-radius: 8px;
-    padding: 14px; font-size: 16px; line-height: 1.6;
-    margin-bottom: 12px; text-align: center;
-    min-height: 72px; display: flex; align-items: center; justify-content: center;
-  }
-  .choices-list { display: flex; flex-direction: column; gap: 9px; }
-  .choice-btn {
-    display: flex; align-items: center; gap: 12px; padding: 14px;
-    background: var(--crimson); border: 2px solid var(--gold);
-    border-radius: 10px; color: var(--off-white);
-    font-size: 15px; font-family: 'Georgia', serif;
-    cursor: pointer; text-align: left; width: 100%;
-    transition: background .15s, transform .1s, border-color .15s;
-  }
-  .choice-btn:active { transform: scale(.98); }
-  .choice-btn:disabled { opacity: .6; cursor: default; transform: none; }
-  .choice-btn.selected { background: var(--crimson2); border-color: var(--gold-l); }
-  .choice-btn.correct  { background: var(--green); border-color: #28a745; }
-  .choice-btn.wrong    { background: var(--red); border-color: #e74c3c; opacity: .65; }
-  .choice-lbl {
-    background: var(--gold); color: var(--crimson); font-weight: bold;
-    border-radius: 6px; width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
-  }
-  .choice-btn.selected .choice-lbl { background: var(--gold-l); }
-  .choice-btn.correct .choice-lbl  { background: #28a745; color: white; }
-  .choice-btn.wrong .choice-lbl    { background: #e74c3c; color: white; }
+/* QUESTION */
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.q-num { font-size: 13px; color: #4DAA8A; font-weight: 600; letter-spacing: 1px; }
+.timer-badge { background: #fff; border: 2px solid var(--green); border-radius: 20px; padding: 4px 14px; font-size: 18px; font-weight: 800; color: var(--green); min-width: 54px; text-align: center; transition: all .3s; }
+.timer-badge.danger { color: var(--red); border-color: var(--red); animation: pulse .5s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.q-text-box { background: #fff; border: 1.5px solid var(--mint); border-radius: 10px; padding: 14px; font-size: 16px; line-height: 1.6; margin-bottom: 12px; text-align: center; min-height: 72px; display: flex; align-items: center; justify-content: center; font-weight: 500; }
+.choices-list { display: flex; flex-direction: column; gap: 9px; }
+.choice-btn { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; color: var(--dark); font-size: 15px; font-family: system-ui, sans-serif; cursor: pointer; text-align: left; width: 100%; font-weight: 500; transition: transform .1s; border: 2px solid transparent; }
+.choice-btn:active { transform: scale(.98); }
+.choice-btn:disabled { opacity: .6; cursor: default; transform: none; }
+.choice-btn-a { background: #E8FBF3; border-color: var(--green); }
+.choice-btn-b { background: #FFF0F1; border-color: var(--red); }
+.choice-btn-c { background: #FFF8E8; border-color: var(--yellow); }
+.choice-btn-d { background: #F0F0FF; border-color: var(--purple); }
+.choice-btn.selected { filter: brightness(.9); }
+.choice-btn.correct  { background: #D4EDDA; border-color: #28a745; }
+.choice-btn.wrong    { opacity: .5; }
+.choice-lbl { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; flex-shrink: 0; color: #fff; }
+.lbl-a { background: var(--green); } .lbl-b { background: var(--red); }
+.lbl-c { background: var(--yellow); } .lbl-d { background: var(--purple); }
 
-  /* ANSWERED */
-  .answered-icon { font-size: 60px; margin-bottom: 10px; }
-  .answered-msg { font-size: 17px; color: var(--off-white); text-align: center; line-height: 1.8; }
-  .answered-time { font-size: 13px; color: var(--gold-l); margin-top: 8px; }
+/* ANSWERED */
+.answered-icon { font-size: 60px; margin-bottom: 10px; }
+.answered-msg { font-size: 17px; color: var(--dark); text-align: center; line-height: 1.8; font-weight: 500; }
+.answered-time { font-size: 13px; color: #4DAA8A; margin-top: 8px; }
+.answered-progress { margin-top: 16px; background: #fff; border: 1.5px solid var(--mint); border-radius: 10px; padding: 12px 16px; width: 100%; max-width: 320px; text-align: center; }
+.ap-text { font-size: 13px; color: #4DAA8A; font-weight: 600; margin-bottom: 8px; }
+.ap-bar-bg { background: var(--mint); border-radius: 4px; height: 8px; overflow: hidden; }
+.ap-bar-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width .4s; }
+.ap-counts { font-size: 12px; color: #4DAA8A; margin-top: 5px; }
 
-  /* RESULT */
-  .result-icon { font-size: 60px; margin-bottom: 6px; }
-  .result-correct { font-size: 26px; font-weight: bold; color: #28a745; }
-  .result-wrong   { font-size: 26px; font-weight: bold; color: #e74c3c; }
-  .result-pts  { font-size: 48px; font-weight: bold; color: var(--gold); margin: 6px 0 2px; }
-  .result-total{ font-size: 13px; color: var(--gold-l); }
-  .result-rank { font-size: 17px; color: var(--off-white); margin-top: 10px; }
+/* RESULT */
+.result-icon { font-size: 60px; margin-bottom: 6px; }
+.result-correct { font-size: 26px; font-weight: 800; color: #28a745; }
+.result-wrong   { font-size: 26px; font-weight: 800; color: var(--red); }
+.result-pts   { font-size: 48px; font-weight: 800; color: var(--green); margin: 6px 0 2px; }
+.result-total { font-size: 13px; color: #4DAA8A; font-weight: 600; }
+.result-rank  { font-size: 18px; color: var(--dark); margin-top: 12px; font-weight: 600; }
 
-  /* RANKING */
-  .ranking-title { font-size: 18px; color: var(--gold); font-weight: bold; margin-bottom: 12px; letter-spacing: 2px; }
-  .ranking-list { width: 100%; max-width: 380px; list-style: none; }
-  .ranking-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 14px; border-radius: 8px; margin-bottom: 8px;
-    background: var(--crimson); border: 1px solid rgba(201,168,76,.35);
-  }
-  .ranking-item.me { border-color: var(--gold); background: rgba(201,168,76,.15); }
-  .rank-badge {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; font-size: 14px; flex-shrink: 0;
-  }
-  .rank-badge.g{background:var(--gold);color:var(--crimson);}
-  .rank-badge.s{background:#aaa;color:#222;}
-  .rank-badge.b{background:#cd7f32;color:white;}
-  .rank-badge.n{background:var(--crimson2);color:var(--off-white);}
-  .rank-name { flex: 1; font-size: 15px; }
-  .rank-score { font-size: 16px; font-weight: bold; color: var(--gold); }
+/* RANKING */
+.ranking-title { font-size: 18px; color: var(--green); font-weight: 700; margin-bottom: 12px; letter-spacing: 1px; }
+.ranking-list { width: 100%; max-width: 380px; list-style: none; }
+.ranking-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; margin-bottom: 8px; background: #fff; border: 1.5px solid var(--mint); }
+.ranking-item.me { border-color: var(--green); background: #E8FBF3; }
+.rank-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+.rb-g{background:var(--yellow);color:var(--dark);} .rb-s{background:#aaa;color:#fff;} .rb-b{background:#cd7f32;color:#fff;} .rb-n{background:var(--mint);color:#4DAA8A;}
+.rank-name  { flex: 1; font-size: 15px; font-weight: 500; }
+.rank-score { font-size: 16px; font-weight: 800; color: var(--green); }
+.rank-delta { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
+.delta-up{color:var(--green);} .delta-down{color:var(--red);} .delta-same{color:#ccc;}
 
-  /* FINISHED */
-  .finished-title { font-size: 26px; color: var(--gold); font-weight: bold; margin-bottom: 6px; letter-spacing: 3px; }
-  .my-final-rank  { font-size: 54px; font-weight: bold; color: var(--gold); }
-  .my-final-score { font-size: 18px; color: var(--off-white); }
-  .thanks { font-size: 14px; color: var(--gold-l); margin-top: 14px; text-align: center; line-height: 1.9; }
-  .save-btn {
-    margin-top: 16px; padding: 12px 28px;
-    background: var(--gold); color: var(--crimson);
-    border: none; border-radius: 8px; font-size: 15px;
-    font-family: 'Georgia', serif; font-weight: bold;
-    cursor: pointer; letter-spacing: 1px;
-  }
+/* FINISHED */
+.finished-title { font-size: 26px; color: var(--green); font-weight: 800; margin-bottom: 6px; letter-spacing: 2px; }
+.my-final-rank  { font-size: 54px; font-weight: 800; color: var(--green); }
+.my-final-score { font-size: 18px; color: var(--dark); font-weight: 500; }
+.thanks { font-size: 14px; color: #4DAA8A; margin-top: 14px; text-align: center; line-height: 1.9; }
+.save-btn { margin-top: 16px; padding: 12px 28px; background: var(--green); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-family: system-ui, sans-serif; font-weight: 700; cursor: pointer; }
 
-  /* CELEBRATION OVERLAY */
-  .celebration {
-    position: fixed; inset: 0; z-index: 100;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    pointer-events: none; opacity: 0;
-    transition: opacity .3s;
-  }
-  .celebration.show { opacity: 1; }
-  .celebration.correct-bg { background: rgba(26,122,52,.92); }
-  .celebration.wrong-bg   { background: rgba(167,29,42,.92); }
-  .celebration-icon  { font-size: 100px; animation: popIn .4s cubic-bezier(.175,.885,.32,1.275); }
-  .celebration-text  { font-size: 32px; font-weight: bold; color: white; margin-top: 10px; letter-spacing: 2px; animation: popIn .4s .1s both cubic-bezier(.175,.885,.32,1.275); }
-  .celebration-pts   { font-size: 22px; color: var(--gold-l); margin-top: 6px; animation: popIn .4s .2s both; }
-  @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+/* CELEBRATION */
+.celebration { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.celebration.show { opacity: 1; }
+.celebration.correct-bg { background: rgba(0,168,120,.92); }
+.celebration.wrong-bg   { background: rgba(255,89,100,.92); }
+.cel-icon { font-size: 100px; animation: popIn .4s cubic-bezier(.175,.885,.32,1.275); }
+.cel-text { font-size: 32px; font-weight: 800; color: #fff; margin-top: 10px; letter-spacing: 2px; animation: popIn .4s .1s both cubic-bezier(.175,.885,.32,1.275); }
+.cel-pts  { font-size: 22px; color: rgba(255,255,255,.9); margin-top: 6px; animation: popIn .4s .2s both; }
+@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
 
-  /* CONFETTI */
-  .confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 99; overflow: hidden; }
-  .confetti-piece {
-    position: absolute; width: 10px; height: 10px; top: -20px;
-    animation: confettiFall linear forwards;
-    border-radius: 2px;
-  }
-  @keyframes confettiFall {
-    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-  }
+.confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 99; overflow: hidden; }
+.confetti-piece { position: absolute; top: -20px; animation: confettiFall linear forwards; border-radius: 2px; }
+@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-  /* RESULT CARD (canvas) */
-  #result-canvas { display: none; }
+#result-canvas { display: none; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="names">💍 あくと ＆ りりか 💍</div>
-  <div>ウェディングクイズ大会</div>
+  <div class="names">💍 あくと & りりか 💍</div>
+  <div class="sub">ウェディングクイズ大会</div>
 </div>
 
 <!-- JOIN -->
 <div class="screen active" id="screen-join">
   <div class="logo">🎊</div>
   <div class="logo-title">クイズ大会</div>
-  <div class="logo-sub">あくと ＆ りりか 結婚式二次会</div>
+  <div class="logo-sub">あくと & りりか 結婚式二次会</div>
   <div class="input-label">ニックネームを入力してください</div>
   <input class="name-input" type="text" id="name-input" maxlength="12" placeholder="例：たろう" autocomplete="off">
-  <button class="btn btn-gold" id="join-btn" onclick="joinGame()">参加する！</button>
+  <button class="btn btn-green" id="join-btn" onclick="joinGame()">参加する！</button>
 </div>
 
 <!-- WAITING -->
@@ -195,6 +143,16 @@
   <div class="wait-emoji">⏳</div>
   <div class="wait-name" id="wait-name"></div>
   <div class="wait-msg">参加登録完了！<br>幹事がクイズを開始するまで<br>お待ちください<span class="wait-dot">…</span></div>
+  <div class="player-badge" id="player-badge">現在 0人 参加中</div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="screen" id="screen-countdown">
+  <div class="cd-wrap">
+    <div class="cd-label" id="cd-label">第1問</div>
+    <div class="cd-num" id="cd-num">3</div>
+    <div class="cd-sub">準備してください！</div>
+  </div>
 </div>
 
 <!-- QUESTION -->
@@ -212,13 +170,18 @@
   <div class="answered-icon">✅</div>
   <div class="answered-msg">回答を送信しました！<br>正解発表をお待ちください</div>
   <div class="answered-time" id="answered-time"></div>
+  <div class="answered-progress" id="answered-progress">
+    <div class="ap-text" id="ap-text">回答中...</div>
+    <div class="ap-bar-bg"><div class="ap-bar-fill" id="ap-bar-fill" style="width:0%"></div></div>
+    <div class="ap-counts" id="ap-counts"></div>
+  </div>
 </div>
 
 <!-- RESULT -->
 <div class="screen" id="screen-result">
   <div class="result-icon" id="result-icon"></div>
   <div id="result-judge"></div>
-  <div class="result-pts"  id="result-pts"></div>
+  <div class="result-pts"   id="result-pts"></div>
   <div class="result-total" id="result-total"></div>
   <div class="result-rank"  id="result-rank"></div>
 </div>
@@ -235,48 +198,44 @@
   <div class="my-final-rank"  id="final-rank">-位</div>
   <div class="my-final-score" id="final-score"></div>
   <ul class="ranking-list" id="final-list" style="margin-top:14px;width:100%;max-width:380px;"></ul>
-  <div class="thanks">ご参加ありがとうございました！<br>🎊 あくと ＆ りりか<br>末永くお幸せに 🎊</div>
+  <div class="thanks">ご参加ありがとうございました！<br>🎊 あくと & りりか<br>末永くお幸せに 🎊</div>
   <button class="save-btn" onclick="saveResultCard()">📸 結果カードを保存する</button>
 </div>
 
-<!-- CELEBRATION OVERLAY -->
+<!-- CELEBRATION -->
 <div class="celebration" id="celebration">
-  <div class="celebration-icon" id="cel-icon"></div>
-  <div class="celebration-text" id="cel-text"></div>
-  <div class="celebration-pts"  id="cel-pts"></div>
+  <div class="cel-icon" id="cel-icon"></div>
+  <div class="cel-text" id="cel-text"></div>
+  <div class="cel-pts"  id="cel-pts"></div>
 </div>
 
-<!-- CONFETTI -->
 <div class="confetti-wrap" id="confetti-wrap"></div>
-
-<!-- Hidden canvas for result card -->
 <canvas id="result-canvas"></canvas>
 
 <script>
 const WS_URL = (location.protocol==='https:'?'wss://':'ws://')+location.host;
 const LABELS = ['A','B','C','D'];
-const COLORS = ['#e74c3c','#f39c12','#2ecc71','#3498db','#9b59b6','#e91e63'];
+const BTN_CLASSES = ['choice-btn-a','choice-btn-b','choice-btn-c','choice-btn-d'];
+const LBL_CLASSES = ['lbl-a','lbl-b','lbl-c','lbl-d'];
+const CONFETTI_COLORS = ['#00A878','#FF5964','#FFB800','#7B68EE','#FF6B35','#F5C842'];
 
-let ws, myId, myName, myScore=0, mySessionKey=null;
-let questionStartTime, timeLimit=20, timerInterval;
-let myAnswer=-1, currentQ=0, totalQ=10;
+let ws, myId, myName, myScore = 0, mySessionKey = null;
+let questionStartTime, timeLimit = 20, timerInterval, cdInterval;
+let myAnswer = -1, currentQ = 0, totalQ = 10;
 
-// ── ローカルストレージでセッション保持 ─────────────────────
 function saveSession(id, key, name, score) {
-  try { localStorage.setItem('wq_session', JSON.stringify({id,key,name,score})); } catch(e){}
+  try { localStorage.setItem('wq_sess', JSON.stringify({id,key,name,score})); } catch(e){}
 }
 function loadSession() {
-  try { return JSON.parse(localStorage.getItem('wq_session')); } catch(e){ return null; }
+  try { return JSON.parse(localStorage.getItem('wq_sess')); } catch(e){ return null; }
 }
 
-// ── WS ─────────────────────────────────────────────────────
 function connect() {
   ws = new WebSocket(WS_URL);
   ws.onopen = () => {
-    // 再接続を試みる
     const sess = loadSession();
     if (sess && sess.key) {
-      ws.send(JSON.stringify({ type:'player_reconnect', sessionKey:sess.key, name:sess.name }));
+      ws.send(JSON.stringify({type:'player_reconnect', sessionKey:sess.key, name:sess.name}));
     }
   };
   ws.onclose = () => setTimeout(connect, 2000);
@@ -284,36 +243,47 @@ function connect() {
     const msg = JSON.parse(e.data);
     switch(msg.type) {
       case 'joined':
-        myId=msg.playerId; myName=msg.name; myScore=msg.score||0;
-        mySessionKey=msg.sessionKey;
-        saveSession(myId, mySessionKey, myName, myScore);
-        document.getElementById('wait-name').textContent=myName+' さん';
-        if(msg.phase==='question') showQuestion(msg.question, msg.elapsed||0);
+        myId=msg.playerId; myName=msg.name; myScore=msg.score||0; mySessionKey=msg.sessionKey;
+        saveSession(myId,mySessionKey,myName,myScore);
+        document.getElementById('wait-name').textContent = myName+' さん';
+        document.getElementById('player-badge').textContent = `現在 ${msg.playerCount}人 参加中`;
+        if (msg.phase==='question') showQuestion(msg.question, msg.elapsed||0);
         else showScreen('screen-waiting');
         break;
 
       case 'reconnected':
-        myId=msg.playerId; myName=msg.name; myScore=msg.score||0;
-        mySessionKey=msg.sessionKey;
-        saveSession(myId, mySessionKey, myName, myScore);
-        document.getElementById('wait-name').textContent=myName+' さん（再接続）';
-        if(msg.phase==='question'){
-          if(msg.alreadyAnswered) showScreen('screen-answered');
+        myId=msg.playerId; myName=msg.name; myScore=msg.score||0; mySessionKey=msg.sessionKey;
+        saveSession(myId,mySessionKey,myName,myScore);
+        document.getElementById('wait-name').textContent = myName+' さん';
+        if (msg.phase==='question') {
+          if (msg.alreadyAnswered) showScreen('screen-answered');
           else showQuestion(msg.question, msg.elapsed||0);
-        } else if(msg.phase==='ranking'||msg.phase==='answer'){
+        } else if (msg.phase==='ranking'||msg.phase==='answer') {
           showRankingScreen(msg.ranking);
         } else {
           showScreen('screen-waiting');
         }
         break;
 
+      case 'player_count':
+        document.getElementById('player-badge').textContent = `現在 ${msg.count}人 参加中`;
+        break;
+
+      case 'countdown_start':
+        myAnswer = -1;
+        showCountdown(msg.questionIndex, msg.total);
+        break;
+
       case 'question_start':
-        myAnswer=-1;
-        showQuestion(msg.question,0);
+        showQuestion(msg.question, 0);
         break;
 
       case 'answer_received':
         showAnswered();
+        break;
+
+      case 'answer_progress':
+        updateAnsweredProgress(msg.answered, msg.total);
         break;
 
       case 'answer_reveal':
@@ -327,41 +297,67 @@ function connect() {
       case 'game_finished':
         showFinished(msg.ranking);
         break;
+
+      case 'game_reset':
+        try { localStorage.removeItem('wq_sess'); } catch(e){}
+        location.reload();
+        break;
     }
   };
 }
 
 function joinGame() {
   const name = document.getElementById('name-input').value.trim();
-  if(!name){ document.getElementById('name-input').focus(); return; }
-  myName=name;
-  document.getElementById('join-btn').disabled=true;
-  // セッションキーをクリアして新規参加
-  try{ localStorage.removeItem('wq_session'); }catch(e){}
-  ws.send(JSON.stringify({type:'player_join',name}));
+  if (!name) { document.getElementById('name-input').focus(); return; }
+  myName = name;
+  document.getElementById('join-btn').disabled = true;
+  try { localStorage.removeItem('wq_sess'); } catch(e){}
+  ws.send(JSON.stringify({type:'player_join', name}));
 }
-document.getElementById('name-input').addEventListener('keydown',e=>{ if(e.key==='Enter') joinGame(); });
+document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') joinGame(); });
 
-// ── SCREENS ────────────────────────────────────────────────
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el){ el.classList.add('active'); el.scrollTop=0; }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
 }
 
-function showQuestion(q, elapsedMs=0) {
-  currentQ=q.index; totalQ=q.total; timeLimit=q.timeLimit;
-  questionStartTime=Date.now()-elapsedMs;
-  myAnswer=-1;
-  document.getElementById('q-num').textContent=`第${q.index+1}問 / 全${q.total}問`;
-  document.getElementById('q-text').textContent=q.question;
-  const list=document.getElementById('choices-list');
-  list.innerHTML='';
-  q.choices.forEach((c,i)=>{
-    const btn=document.createElement('button');
-    btn.className='choice-btn'; btn.id='choice-btn-'+i;
-    btn.innerHTML=`<span class="choice-lbl">${LABELS[i]}</span><span>${c}</span>`;
-    btn.onclick=()=>sendAnswer(i);
+function showCountdown(qIdx, total) {
+  currentQ = qIdx; totalQ = total;
+  showScreen('screen-countdown');
+  document.getElementById('cd-label').textContent = `第${qIdx+1}問 / 全${total}問`;
+  let count = 3;
+  const numEl = document.getElementById('cd-num');
+  numEl.textContent = count;
+  clearInterval(cdInterval);
+  cdInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      numEl.textContent = count;
+      numEl.style.animation = 'none';
+      void numEl.offsetWidth;
+      numEl.style.animation = 'cdPop .4s ease';
+    } else {
+      clearInterval(cdInterval);
+    }
+  }, 1000);
+}
+
+function showQuestion(q, elapsedMs = 0) {
+  clearInterval(cdInterval);
+  currentQ = q.index; totalQ = q.total; timeLimit = q.timeLimit;
+  questionStartTime = Date.now() - elapsedMs;
+  myAnswer = -1;
+  document.getElementById('q-num').textContent = `第${q.index+1}問 / 全${q.total}問`;
+  document.getElementById('q-text').textContent = q.question;
+  const list = document.getElementById('choices-list');
+  list.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = `choice-btn ${BTN_CLASSES[i]}`;
+    btn.id = 'choice-btn-'+i;
+    btn.innerHTML = `<span class="choice-lbl ${LBL_CLASSES[i]}">${LABELS[i]}</span><span>${c}</span>`;
+    btn.onclick = () => sendAnswer(i);
     list.appendChild(btn);
   });
   showScreen('screen-question');
@@ -370,200 +366,167 @@ function showQuestion(q, elapsedMs=0) {
 
 function startTimer() {
   clearInterval(timerInterval);
-  const badge=document.getElementById('timer-badge');
-  timerInterval=setInterval(()=>{
-    const elapsed=(Date.now()-questionStartTime)/1000;
-    const remaining=Math.max(0,timeLimit-elapsed);
-    badge.textContent=Math.ceil(remaining);
-    badge.className='timer-badge'+(remaining<6?' danger':'');
-    if(remaining<=0){ clearInterval(timerInterval); disableChoices(); }
-  },100);
+  const badge = document.getElementById('timer-badge');
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - questionStartTime) / 1000;
+    const remaining = Math.max(0, timeLimit - elapsed);
+    badge.textContent = Math.ceil(remaining);
+    badge.className = 'timer-badge' + (remaining < 6 ? ' danger' : '');
+    if (remaining <= 0) { clearInterval(timerInterval); disableChoices(); }
+  }, 100);
 }
 
 function sendAnswer(idx) {
-  if(myAnswer>=0) return;
-  myAnswer=idx;
-  document.querySelectorAll('.choice-btn').forEach((b,i)=>{
-    if(i===idx) b.classList.add('selected');
-    b.disabled=true;
+  if (myAnswer >= 0) return;
+  myAnswer = idx;
+  document.querySelectorAll('.choice-btn').forEach((b, i) => {
+    if (i === idx) b.classList.add('selected');
+    b.disabled = true;
   });
-  ws.send(JSON.stringify({type:'answer',choice:idx}));
+  ws.send(JSON.stringify({type:'answer', choice:idx}));
 }
 
 function disableChoices() {
-  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
 }
 
 function showAnswered() {
   clearInterval(timerInterval);
-  const ms=Date.now()-questionStartTime;
-  document.getElementById('answered-time').textContent=`回答時間：${(ms/1000).toFixed(2)}秒`;
+  const ms = Date.now() - questionStartTime;
+  document.getElementById('answered-time').textContent = `回答時間：${(ms/1000).toFixed(2)}秒`;
   showScreen('screen-answered');
+}
+
+function updateAnsweredProgress(answered, total) {
+  const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+  const remaining = total - answered;
+  document.getElementById('ap-text').textContent = remaining > 0 ? `あと ${remaining}人 が回答中` : '全員回答完了！';
+  document.getElementById('ap-bar-fill').style.width = pct + '%';
+  document.getElementById('ap-counts').textContent = `${answered} / ${total} 人`;
 }
 
 function showResult(msg) {
   clearInterval(timerInterval);
-  const correct=msg.correct;
-  const myAns=msg.answers[myId];
-  const isCorrect=myAns && myAns.choice===correct;
-  const pts=myAns ? (myAns.points||0) : 0;
-  myScore+=pts;
+  const correct = msg.correct;
+  const myAns = msg.answers[myId];
+  const isCorrect = myAns && myAns.choice === correct;
+  const pts = myAns ? (myAns.points || 0) : 0;
+  myScore += pts;
   saveSession(myId, mySessionKey, myName, myScore);
 
-  const ranking=msg.ranking;
-  const myRankObj=ranking.find(r=>r.id===myId);
-  const myRank=myRankObj ? myRankObj.rank : '-';
+  const ranking = msg.ranking;
+  const myRankObj = ranking.find(r => r.id === myId);
+  const myRank = myRankObj ? myRankObj.rank : '-';
 
-  // 演出オーバーレイ
   showCelebration(isCorrect, pts, myAns);
 
-  // 結果画面の準備（オーバーレイの裏で）
-  document.getElementById('result-icon').textContent=isCorrect?'🎉':'😢';
-  const judge=document.getElementById('result-judge');
-  if(isCorrect){ judge.className='result-correct'; judge.textContent='正解！'; }
+  document.getElementById('result-icon').textContent = isCorrect ? '🎉' : '😢';
+  const judge = document.getElementById('result-judge');
+  if (isCorrect) { judge.className='result-correct'; judge.textContent='正解！'; }
   else { judge.className='result-wrong'; judge.textContent=myAns?'不正解…':'時間切れ…'; }
-  document.getElementById('result-pts').textContent=isCorrect?`+${pts}pts`:'+0pts';
-  document.getElementById('result-total').textContent=`累計：${myScore}pts`;
-  document.getElementById('result-rank').textContent=`現在 ${myRank}位`;
+  document.getElementById('result-pts').textContent = isCorrect ? `+${pts}pts` : '+0pts';
+  document.getElementById('result-total').textContent = `累計：${myScore}pts`;
+  document.getElementById('result-rank').textContent = `現在 ${myRank}位`;
   showScreen('screen-result');
 }
 
-// ── CELEBRATION ────────────────────────────────────────────
 function showCelebration(isCorrect, pts, myAns) {
-  const cel=document.getElementById('celebration');
-  document.getElementById('cel-icon').textContent=isCorrect?'🎉':'💥';
-  document.getElementById('cel-text').textContent=isCorrect?'正　解！':myAns?'不正解…':'時間切れ…';
-  document.getElementById('cel-pts').textContent=isCorrect?`+${pts}pts`:'';
-  cel.className='celebration show '+(isCorrect?'correct-bg':'wrong-bg');
-  if(isCorrect) spawnConfetti();
-  setTimeout(()=>{ cel.className='celebration'; }, 2000);
+  const cel = document.getElementById('celebration');
+  document.getElementById('cel-icon').textContent = isCorrect ? '🎉' : '💥';
+  document.getElementById('cel-text').textContent = isCorrect ? '正　解！' : myAns ? '不正解…' : '時間切れ…';
+  document.getElementById('cel-pts').textContent = isCorrect ? `+${pts}pts` : '';
+  cel.className = 'celebration show ' + (isCorrect ? 'correct-bg' : 'wrong-bg');
+  if (isCorrect) spawnConfetti();
+  setTimeout(() => { cel.className = 'celebration'; }, 2000);
 }
 
 function spawnConfetti() {
-  const wrap=document.getElementById('confetti-wrap');
-  wrap.innerHTML='';
-  for(let i=0;i<40;i++){
-    const el=document.createElement('div');
-    el.className='confetti-piece';
-    el.style.cssText=`
-      left:${Math.random()*100}%;
-      background:${COLORS[Math.floor(Math.random()*COLORS.length)]};
-      animation-duration:${0.8+Math.random()*1.2}s;
-      animation-delay:${Math.random()*0.3}s;
-      transform:rotate(${Math.random()*360}deg);
-      width:${6+Math.random()*8}px;
-      height:${6+Math.random()*8}px;
-    `;
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random()*100}%;background:${CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]};animation-duration:${0.8+Math.random()*1.2}s;animation-delay:${Math.random()*0.3}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
     wrap.appendChild(el);
   }
-  setTimeout(()=>wrap.innerHTML='',2500);
+  setTimeout(() => wrap.innerHTML = '', 2500);
 }
 
 function showRankingScreen(ranking) {
-  const ul=document.getElementById('ranking-list');
-  ul.innerHTML='';
-  ranking.forEach(p=>{
-    const isMe=p.id===myId;
-    const li=document.createElement('li');
-    const medals=['🥇','🥈','🥉'];
-    const badgeCls=p.rank<=3?['g','s','b'][p.rank-1]:'n';
-    const badge=p.rank<=3?medals[p.rank-1]:p.rank;
-    li.className='ranking-item'+(isMe?' me':'');
-    li.innerHTML=`<div class="rank-badge ${badgeCls}">${badge}</div>
-      <div class="rank-name">${esc(p.name)}${isMe?' 👈':''}</div>
-      <div class="rank-score">${p.score}pts</div>`;
+  const ul = document.getElementById('ranking-list');
+  ul.innerHTML = '';
+  ranking.forEach(p => {
+    const isMe = p.id === myId;
+    const medals = ['🥇','🥈','🥉'];
+    const badgeCls = p.rank<=3 ? ['rb-g','rb-s','rb-b'][p.rank-1] : 'rb-n';
+    const badge = p.rank<=3 ? medals[p.rank-1] : p.rank;
+    const delta = p.delta || 0;
+    const deltaHtml = delta > 0
+      ? `<span class="rank-delta delta-up">▲${delta}</span>`
+      : delta < 0
+      ? `<span class="rank-delta delta-down">▼${Math.abs(delta)}</span>`
+      : `<span class="rank-delta delta-same">－</span>`;
+    const li = document.createElement('li');
+    li.className = 'ranking-item' + (isMe?' me':'');
+    li.innerHTML = `<div class="rank-badge ${badgeCls}">${badge}</div><div class="rank-name">${esc(p.name)}${isMe?' 👈':''}</div><div class="rank-score">${p.score}pts</div>${deltaHtml}`;
     ul.appendChild(li);
   });
   showScreen('screen-ranking');
 }
 
 function showFinished(ranking) {
-  const myRankObj=ranking.find(r=>r.id===myId);
-  const myRank=myRankObj?myRankObj.rank:'-';
-  myScore=myRankObj?myRankObj.score:myScore;
-  const medals=['🥇','🥈','🥉'];
-  document.getElementById('final-rank').textContent=myRank<=3?(medals[myRank-1]+' '+myRank+'位'):myRank+'位';
-  document.getElementById('final-score').textContent=`合計 ${myScore}pts`;
-  const ul=document.getElementById('final-list');
-  ul.innerHTML='';
-  ranking.slice(0,5).forEach(p=>{
-    const isMe=p.id===myId;
-    const li=document.createElement('li');
-    const badgeCls=p.rank<=3?['g','s','b'][p.rank-1]:'n';
-    const badge=p.rank<=3?medals[p.rank-1]:p.rank;
-    li.className='ranking-item'+(isMe?' me':'');
-    li.innerHTML=`<div class="rank-badge ${badgeCls}">${badge}</div>
-      <div class="rank-name">${esc(p.name)}${isMe?' 👈':''}</div>
-      <div class="rank-score">${p.score}pts</div>`;
+  const myRankObj = ranking.find(r => r.id === myId);
+  const myRank = myRankObj ? myRankObj.rank : '-';
+  myScore = myRankObj ? myRankObj.score : myScore;
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('final-rank').textContent = myRank<=3 ? (medals[myRank-1]+' '+myRank+'位') : myRank+'位';
+  document.getElementById('final-score').textContent = `合計 ${myScore}pts`;
+  const ul = document.getElementById('final-list');
+  ul.innerHTML = '';
+  ranking.slice(0,5).forEach(p => {
+    const isMe = p.id === myId;
+    const badgeCls = p.rank<=3 ? ['rb-g','rb-s','rb-b'][p.rank-1] : 'rb-n';
+    const badge = p.rank<=3 ? medals[p.rank-1] : p.rank;
+    const li = document.createElement('li');
+    li.className = 'ranking-item' + (isMe?' me':'');
+    li.innerHTML = `<div class="rank-badge ${badgeCls}">${badge}</div><div class="rank-name">${esc(p.name)}${isMe?' 👈':''}</div><div class="rank-score">${p.score}pts</div>`;
     ul.appendChild(li);
   });
   showScreen('screen-finished');
   spawnConfetti();
 }
 
-// ── 結果カード保存 ─────────────────────────────────────────
 function saveResultCard() {
-  const canvas=document.getElementById('result-canvas');
-  const ctx=canvas.getContext('2d');
-  canvas.width=600; canvas.height=400;
-
-  // 背景
-  ctx.fillStyle='#4A000B';
-  ctx.fillRect(0,0,600,400);
-
-  // 金枠
-  ctx.strokeStyle='#C9A84C'; ctx.lineWidth=6;
-  ctx.strokeRect(10,10,580,380);
-  ctx.lineWidth=2;
-  ctx.strokeRect(22,22,556,356);
-
-  // タイトル
-  ctx.fillStyle='#C9A84C';
-  ctx.font='bold 22px Georgia';
-  ctx.textAlign='center';
-  ctx.fillText('💍 あくと ＆ りりか ウェディングクイズ', 300, 65);
-
-  // 区切り線
-  ctx.strokeStyle='#C9A84C'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(60,80); ctx.lineTo(540,80); ctx.stroke();
-
-  // 名前
-  ctx.fillStyle='#F5EED8';
-  ctx.font='bold 28px Georgia';
+  const canvas = document.getElementById('result-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 600; canvas.height = 400;
+  ctx.fillStyle = '#F0FBF7'; ctx.fillRect(0,0,600,400);
+  ctx.strokeStyle = '#00A878'; ctx.lineWidth = 6; ctx.strokeRect(8,8,584,384);
+  ctx.strokeStyle = '#B8EAD9'; ctx.lineWidth = 2; ctx.strokeRect(16,16,568,368);
+  ctx.fillStyle = '#00A878'; ctx.fillRect(8,8,584,90);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 22px system-ui,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('💍 あくと & りりか ウェディングクイズ', 300, 44);
+  ctx.font = '15px system-ui,sans-serif'; ctx.fillText('Wedding Quiz Party', 300, 72);
+  ctx.fillStyle = '#0D3D2E'; ctx.font = 'bold 26px system-ui,sans-serif';
   ctx.fillText(myName, 300, 130);
-
-  // 順位
-  const rankEl=document.getElementById('final-rank').textContent;
-  ctx.fillStyle='#E8D08A';
-  ctx.font='bold 72px Georgia';
-  ctx.fillText(rankEl, 300, 220);
-
-  // スコア
-  ctx.fillStyle='#C9A84C';
-  ctx.font='bold 26px Georgia';
-  ctx.fillText(`${myScore} pts`, 300, 265);
-
-  // 区切り線
-  ctx.beginPath(); ctx.moveTo(60,285); ctx.lineTo(540,285); ctx.stroke();
-
-  // メッセージ
-  ctx.fillStyle='#F5EED8';
-  ctx.font='18px Georgia';
-  ctx.fillText('ご参加ありがとうございました！', 300, 325);
-  ctx.fillStyle='#C9A84C';
-  ctx.font='15px Georgia';
-  ctx.fillText('🎊 おふたりの末永いお幸せをお祈りします 🎊', 300, 358);
-
-  // ダウンロード
-  canvas.toBlob(blob=>{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=`quiz-result-${myName}.png`;
+  ctx.fillStyle = '#00A878'; ctx.font = 'bold 68px system-ui,sans-serif';
+  ctx.fillText(document.getElementById('final-rank').textContent, 300, 215);
+  ctx.fillStyle = '#4DAA8A'; ctx.font = 'bold 24px system-ui,sans-serif';
+  ctx.fillText(`${myScore} pts`, 300, 258);
+  ctx.strokeStyle = '#B8EAD9'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(60,278); ctx.lineTo(540,278); ctx.stroke();
+  ctx.fillStyle = '#0D3D2E'; ctx.font = '17px system-ui,sans-serif';
+  ctx.fillText('ご参加ありがとうございました！', 300, 315);
+  ctx.fillStyle = '#00A878'; ctx.font = '14px system-ui,sans-serif';
+  ctx.fillText('🎊 おふたりの末永いお幸せをお祈りします 🎊', 300, 350);
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `quiz-result-${myName}.png`;
     a.click();
   });
 }
 
-function esc(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 connect();
 </script>
